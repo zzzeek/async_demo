@@ -6,12 +6,8 @@ for msg in ["one", "two", "three", "four", "five"]:
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.connect(("tcpbin.com", 4242))
     sock.setblocking(False)
-    socks[sock] = {
-        "socket": sock,
-        "cmd": "write",
-        "total_sent": 0,
+    socks[sock] = {"socket": sock,"cmd": "write", "data_recv": "",
         "data_send": f"message number {msg}\n".encode("ascii"),
-        "data_recv": "",
     }
 
 while True:
@@ -22,7 +18,6 @@ while True:
     )
     for writer in writers:
         sent = writer.send(socks[writer]["data_send"])
-        socks[writer]["total_sent"] += sent
         socks[writer]["data_send"] = socks[writer]["data_send"][sent:]
         if not socks[writer]["data_send"]:
             socks[writer]["cmd"] = "read"
@@ -38,4 +33,5 @@ while True:
 
     if not any(sock["cmd"] != "done" for sock in socks.values()):
         break
+
 
